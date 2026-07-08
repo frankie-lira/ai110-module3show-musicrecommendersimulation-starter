@@ -11,23 +11,55 @@ Your goal is to:
 - Evaluate what your system gets right and wrong
 - Reflect on how this mirrors real world AI recommenders
 
-Replace this paragraph with your own summary of what your version does.
+This project implements a content-based music recommender. Instead of using other 
+users' listening behavior (collaborative filtering), it scores each song by comparing 
+its own attributes — genre, mood, energy, valence, and acousticness — against a user's 
+stated preferences. It then ranks the full song list to produce recommendations.
 
 ---
 
 ## How The System Works
 
-Explain your design in plain language.
+Real-world recommenders like Spotify and YouTube generally use two approaches: 
+collaborative filtering, which predicts what a user will like based on patterns across 
+many users' behavior (plays, skips, saves), and content-based filtering, which predicts 
+based on an item's own attributes (genre, tempo, energy). This simulation implements a 
+content-based recommender.
 
-Some prompts to answer:
+**Song features:**
+- `genre` (categorical) — e.g. pop, lofi, rock, ambient, jazz, synthwave, indie pop
+- `mood` (categorical) — e.g. happy, chill, intense, relaxed, moody, focused
+- `energy` (numerical, 0–1) — how intense/energetic the song feels
+- `valence` (numerical, 0–1) — how positive/upbeat vs. dark the song feels
+- `acousticness` (numerical, 0–1) — acoustic/organic vs. synthetic/produced
+- `tempo_bpm` (numerical, ~60–160) — the song's tempo
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+**UserProfile features:**
+- `preferred_genre`
+- `preferred_energy` (0–1)
+- `preferred_valence` (0–1)
+- `preferred_acousticness` (0–1)
 
-You can include a simple diagram or bullet list if helpful.
+**How the Recommender scores a song:**
+Each numerical feature is compared using normalized similarity: 
+`similarity = 1 - |user_pref - song_value|` (with tempo_bpm min-max normalized first, 
+since it isn't already on a 0–1 scale like the others). Genre is scored as an exact 
+match (1) or non-match (0), with room to upgrade to graded "genre family" matching 
+later (e.g. lofi/ambient/jazz treated as related). The final score combines these with 
+weights: `score = 0.30·sim(energy) + 0.25·sim(valence) + 0.20·sim(acousticness) + 0.25·genre_score`.
+
+**How songs are chosen:**
+Scoring a song is a *local* operation — it only tells you how well one song matches 
+a user, not how it compares to everything else. The Recommender separately runs a 
+ranking step across the full song list: sorting by score, breaking ties (e.g. by song 
+id), and cutting the list down to a top-N recommendation set. This separation matters 
+because a good score is only meaningful relative to other songs' scores, and because 
+list-level rules — like avoiding near-duplicate recommendations or excluding songs 
+already played — can't be handled by scoring a single song in isolation.
+
+This design prioritizes explainability and handles brand-new songs immediately (no 
+cold-start problem), at the tradeoff of being less able to surface unexpected, 
+serendipitous recommendations the way collaborative filtering can.
 
 ---
 
