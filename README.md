@@ -27,19 +27,19 @@ based on an item's own attributes (genre, tempo, energy). This simulation implem
 content-based recommender.
 
 **Song features:**
-- `genre` (categorical) — e.g. pop, lofi, rock, ambient, jazz, synthwave, indie pop, and others added in Phase 2 (hip-hop, classical, r&b, folk, electronic, metal, country, reggae)
-- `mood` (categorical) — e.g. happy, chill, intense, relaxed, moody, focused
-- `energy` (numerical, 0–1) — how intense/energetic the song feels
-- `valence` (numerical, 0–1) — how positive/upbeat vs. dark the song feels
-- `acousticness` (numerical, 0–1) — acoustic/organic vs. synthetic/produced
-- `tempo_bpm` (numerical, ~60–160) — the song's tempo (tracked but not currently used in scoring — a candidate feature for future iterations)
+- \`genre\` (categorical) — e.g. pop, lofi, rock, ambient, jazz, synthwave, indie pop, and others added in Phase 2 (hip-hop, classical, r&b, folk, electronic, metal, country, reggae)
+- \`mood\` (categorical) — e.g. happy, chill, intense, relaxed, moody, focused
+- \`energy\` (numerical, 0–1) — how intense/energetic the song feels
+- \`valence\` (numerical, 0–1) — how positive/upbeat vs. dark the song feels
+- \`acousticness\` (numerical, 0–1) — acoustic/organic vs. synthetic/produced
+- \`tempo_bpm\` (numerical, ~60–160) — the song's tempo (tracked but not currently used in scoring — a candidate feature for future iterations)
 
 **UserProfile features:**
-- `favorite_genre`
-- `favorite_mood`
-- `target_energy` (0–1)
-- `target_valence` (0–1)
-- `target_acousticness` (0–1)
+- \`favorite_genre\`
+- \`favorite_mood\`
+- \`target_energy\` (0–1)
+- \`target_valence\` (0–1)
+- \`target_acousticness\` (0–1)
 
 **How songs are chosen:**
 Scoring a song is a *local* operation — it only tells you how well one song matches 
@@ -56,13 +56,13 @@ serendipitous recommendations the way collaborative filtering can.
 
 **Algorithm Recipe (finalized):**
 
-```
+\`\`\`
 score(song) = 30 × (1 - |acousticness - target_acousticness|)   # strongest discriminator
             + 20 × (1 - |energy - target_energy|)                # strong
             + 5  × (1 - |valence - target_valence|)               # weak, kept small
             + 15 if genre == favorite_genre else 0                # soft bonus
             + 10 if mood == favorite_mood else 0                  # soft bonus
-```
+\`\`\`
 
 Maximum possible score: 80 points.
 
@@ -101,48 +101,56 @@ barely separates songs at all.
 
 1. Create a virtual environment (optional but recommended):
 
-   ```bash
+   \`\`\`bash
    python -m venv .venv
    source .venv/bin/activate      # Mac or Linux
    .venv\Scripts\activate         # Windows
-   ```
+   \`\`\`
 
 2. Install dependencies
 
-   ```bash
+   \`\`\`bash
    pip install -r requirements.txt
-   ```
+   \`\`\`
 
 3. Run the app:
 
-   ```bash
+   \`\`\`bash
    python -m src.main
-   ```
+   \`\`\`
 
 ### Running Tests
 
 Run the starter tests with:
 
-```bash
+\`\`\`bash
 pytest
-```
+\`\`\`
 
-You can add more tests in `tests/test_recommender.py`.
+You can add more tests in \`tests/test_recommender.py\`.
 
 ---
 
 ## Sample Recommendation Output
 
-Paste a sample of your recommender's output here as a text block so a reader can see what it produces:
+\`\`\`
+Top recommendations:
 
-```
-# e.g.:
-# User profile: genre=indie, mood=chill, energy=low
-# Recommendations:
-#   1. ...
-#   2. ...
-#   3. ...
-```
+Sunrise City – Score: 76.90
+Because: Acousticness match: +27.6, Energy match: +19.6, Valence match: +4.7, Genre match (pop): +15, Mood match (happy): +10
+
+Gym Hero – Score: 65.25
+Because: Acousticness match: +28.5, Energy match: +17.4, Valence match: +4.3, Genre match (pop): +15
+
+Rooftop Lights – Score: 56.25
+Because: Acousticness match: +22.5, Energy match: +19.2, Valence match: +4.5, Mood match (happy): +10
+
+Concrete Bars – Score: 51.80
+Because: Acousticness match: +29.4, Energy match: +18.8, Valence match: +3.6
+
+Pulse Machine – Score: 51.25
+Because: Acousticness match: +28.8, Energy match: +18.4, Valence match: +4.0
+\`\`\`
 
 **Screenshot or video** *(optional)*: <!-- Insert a screenshot or demo video link here -->
 
@@ -174,7 +182,7 @@ You will go deeper on this in your model card.
 
 ## Reflection
 
-Read and complete `model_card.md`:
+Read and complete \`model_card.md\`:
 
 [**Model Card**](model_card.md)
 

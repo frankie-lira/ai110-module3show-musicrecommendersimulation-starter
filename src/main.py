@@ -9,14 +9,20 @@ You will implement the functions in recommender.py:
 - recommend_songs
 """
 
-from recommender import load_songs, recommend_songs
+from src.recommender import load_songs, recommend_songs
 
 
 def main() -> None:
     songs = load_songs("data/songs.csv") 
 
-    # Starter example profile
-    user_prefs = {"genre": "pop", "mood": "happy", "energy": 0.8}
+    # Starter example profile — all five keys the scoring recipe expects
+    user_prefs = {
+        "favorite_genre": "pop",
+        "favorite_mood": "happy",
+        "target_energy": 0.8,
+        "target_valence": 0.9,
+        "target_acousticness": 0.1,
+    }
 
     recommendations = recommend_songs(user_prefs, songs, k=5)
 
@@ -24,9 +30,9 @@ def main() -> None:
     for rec in recommendations:
         # You decide the structure of each returned item.
         # A common pattern is: (song, score, explanation)
-        song, score, explanation = rec
+        song, score, reasons = rec
         print(f"{song['title']} - Score: {score:.2f}")
-        print(f"Because: {explanation}")
+        print(f"Because: {', '.join(reasons)}")
         print()
 
 
