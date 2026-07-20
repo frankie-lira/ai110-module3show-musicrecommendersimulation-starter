@@ -2,110 +2,161 @@
 
 ## 1. Model Name  
 
-Give your model a short, descriptive name.  
-Example: **VibeFinder 1.0**  
+**VibeMatch 1.0**
 
 ---
 
 ## 2. Intended Use  
 
-Describe what your recommender is designed to do and who it is for. 
+This recommender is designed for classroom exploration of how content-based 
+recommendation systems work, not for real-world deployment. Given a user's stated 
+music taste preferences (favorite genre, favorite mood, and target energy/valence/
+acousticness values), it scores every song in a small catalog and returns the top-K 
+matches with plain-language explanations for each score.
 
-Prompts:  
-
-- What kind of recommendations does it generate  
-- What assumptions does it make about the user  
-- Is this for real users or classroom exploration  
+It assumes the user can articulate their preferences as explicit numeric/categorical 
+values rather than inferring taste from listening behavior. It is a simulation meant 
+to demonstrate and evaluate the mechanics of content-based scoring, not a production 
+recommender for real listeners.
 
 ---
 
 ## 3. How the Model Works  
 
-Explain your scoring approach in simple language.  
+Every song has five key traits: genre, mood, energy, valence, and acousticness. A 
+user describes their taste using the same traits — a favorite genre, a favorite mood, 
+and target values for energy, valence, and acousticness.
 
-Prompts:  
+To score a song, the system checks how close the song's energy, valence, and 
+acousticness are to what the user asked for, and gives partial credit the closer they 
+are — a perfect match earns full points, and the points shrink the further off the 
+song is. On top of that, the song gets a bonus if its genre matches the user's 
+favorite genre, and another bonus if its mood matches the user's favorite mood. All 
+of these points get added together into one final score, and the system does this for 
+every song in the catalog, then sorts them from highest score to lowest to produce the 
+final recommendation list.
 
-- What features of each song are used (genre, energy, mood, etc.)  
-- What user preferences are considered  
-- How does the model turn those into a score  
-- What changes did you make from the starter logic  
-
-Avoid code here. Pretend you are explaining the idea to a friend who does not program.
+Acousticness carries the most weight (30 of 80 possible points), followed by energy 
+(20 points), then the genre and mood bonuses (15 and 10 points), with valence 
+carrying the least weight (5 points). This is different from an early draft of the 
+scoring logic, which weighted energy and valence roughly equally — the final weights 
+were chosen after analyzing which features actually vary enough across the catalog to 
+tell songs apart.
 
 ---
 
 ## 4. Data  
 
-Describe the dataset the model uses.  
+The catalog contains **18 songs**. The original starter file had 10 songs across 7 
+genres (pop, lofi, rock, ambient, jazz, synthwave, indie pop); 8 more songs were added 
+covering genres not previously represented (hip-hop, classical, r&b, folk, electronic, 
+metal, country, reggae), bringing the total to 15 genres across 18 songs and roughly 
+14 distinct moods.
 
-Prompts:  
-
-- How many songs are in the catalog  
-- What genres or moods are represented  
-- Did you add or remove data  
-- Are there parts of musical taste missing in the dataset  
+No data was removed. Because genres and moods are spread so thin across only 18 
+songs (most genres appear only once or twice), the dataset likely does not capture 
+the full range of real musical taste — subgenres, regional styles, instrumental vs. 
+vocal preference, and lyrical content are entirely missing from the catalog.
 
 ---
 
 ## 5. Strengths  
 
-Where does your system seem to work well  
+The system gives sensible, explainable results for users whose stated preferences 
+line up cleanly with a genre/mood in the catalog. For example, a "Deep Intense Rock" 
+profile (rock genre, intense mood, high energy, low acousticness) correctly surfaced 
+"Storm Runner" as the clear top pick with the highest score seen in any test (79.40) — 
+matching genre, mood, energy, and acousticness all at once.
 
-Prompts:  
+Comparing opposite profiles also confirmed the system responds sensibly to different 
+tastes: a "Chill Lofi" profile favored calm, high-acousticness songs (Library Rain, 
+Midnight Coding), while "Deep Intense Rock" favored high-energy, low-acousticness 
+songs (Storm Runner, Iron Verdict) — showing the scoring logic correctly separates 
+opposite ends of the taste spectrum.
 
-- User types for which it gives reasonable results  
-- Any patterns you think your scoring captures correctly  
-- Cases where the recommendations matched your intuition  
+The system is also transparent: every recommendation comes with a plain-language 
+breakdown of exactly why it scored the way it did, rather than a black-box number.
 
 ---
 
 ## 6. Limitations and Bias 
 
-Where the system struggles or behaves unfairly. 
+The scoring formula weights acousticness (30 pts) more heavily than energy (20 pts). 
+This means a user who wants high-energy music but also indicates any acoustic 
+preference will have their energy preference overridden — the "Acoustic Headbanger" 
+test profile (energy=1.0, acousticness=1.0) returned the catalog's calmest, most 
+acoustic songs as its top picks, not the most energetic ones, even though the user 
+explicitly asked for maximum energy. The system has no way to detect or flag 
+contradictory input; it silently averages the terms into a "compromise" that doesn't 
+actually satisfy either stated preference.
 
-Prompts:  
+Because genre and mood values are so sparse across only 18 songs, most user profiles 
+will only get their genre/mood bonus applied to a handful of songs (sometimes just 
+one), meaning the numeric features (acousticness, energy, valence) end up doing most 
+of the real work in ranking — genre/mood act more like light tie-breakers than 
+meaningful preferences. Valence in particular is nearly useless as a discriminator, 
+since most songs in the catalog cluster tightly in the same valence range (0.48–0.84).
 
-- Features it does not consider  
-- Genres or moods that are underrepresented  
-- Cases where the system overfits to one preference  
-- Ways the scoring might unintentionally favor some users  
+The system might also unintentionally favor whichever genre/mood happens to be best 
+represented in the catalog (pop and happy, in this case), since users whose taste 
+matches an underrepresented genre have fewer songs available to ever score well.
 
 ---
 
 ## 7. Evaluation  
 
-How you checked whether the recommender behaved as expected. 
+I tested four user profiles: Starter (Pop Happy), High-Energy Pop, Chill Lofi, and 
+Deep Intense Rock, plus one adversarial profile designed to break the system.
 
-Prompts:  
+Each of the four "normal" profiles produced results that matched my musical intuition — 
+happy/pop preferences surfaced upbeat pop songs, chill/lofi preferences surfaced calm 
+acoustic songs, and intense/rock preferences surfaced high-energy rock songs. The 
+biggest surprise came from comparing High-Energy Pop against the Starter profile: 
+even with energy pushed up to 0.9, the ranking barely changed, because acousticness 
+was doing more of the work than energy in the scoring formula.
 
-- Which user profiles you tested  
-- What you looked for in the recommendations  
-- What surprised you  
-- Any simple tests or comparisons you ran  
-
-No need for numeric metrics unless you created some.
+The adversarial test — "The Acoustic Headbanger" (energy=1.0, acousticness=1.0, 
+mood="angry", genre="k-pop," none of which exist in the catalog) — was the most 
+revealing. I expected the system to either surface the catalog's most energetic songs 
+or produce an obviously bad/low-confidence result. Instead, it confidently returned 
+the calmest, most acoustic songs in the catalog as its "top" recommendation, with no 
+indication that the user's preferences were contradictory or unmatchable. This 
+confirmed that acousticness's higher weight silently overrides energy whenever the 
+two pull in opposite directions.
 
 ---
 
 ## 8. Future Work  
 
-Ideas for how you would improve the model next.  
-
-Prompts:  
-
-- Additional features or preferences  
-- Better ways to explain recommendations  
-- Improving diversity among the top results  
-- Handling more complex user tastes  
+- Add a way to detect contradictory preferences (e.g., very high energy + very high 
+  acousticness) and either flag low confidence or ask the user to clarify, instead of 
+  silently averaging into a compromise no real song matches.
+- Rebalance or dynamically adjust feature weights based on how much each feature 
+  actually varies in a given catalog, rather than using one fixed set of weights.
+- Add more songs per genre/mood so genre and mood bonuses can play a more meaningful 
+  role instead of acting as light tie-breakers.
+- Add diversity logic to the ranking step so the top-K results aren't dominated by 
+  near-duplicate songs (e.g. multiple songs from the same artist or nearly identical 
+  attribute profiles).
+- Consider additional features like instrumentalness or a context/activity tag 
+  (workout, study, party) to capture dimensions of taste the current numeric features 
+  can't reach.
 
 ---
 
 ## 9. Personal Reflection  
 
-A few sentences about your experience.  
+Building this project showed me how much of a recommender's "intelligence" actually 
+comes down to arithmetic and weight choices rather than anything resembling real 
+understanding of music. The system doesn't know what a song sounds like — it's just 
+comparing numbers and adding up points, and the weights I chose for those numbers 
+completely determine what the system considers a "good" recommendation.
 
-Prompts:  
-
-- What you learned about recommender systems  
-- Something unexpected or interesting you discovered  
-- How this changed the way you think about music recommendation apps  
+The most interesting discovery was building an adversarial test case on purpose. I 
+expected requesting maximum energy and maximum acousticness at the same time to 
+either break the system or get flagged as invalid, but instead it just quietly 
+returned a result that satisfied neither preference the user actually cared about. 
+This changed how I think about real recommendation apps — a confident-looking "Top 
+Pick" doesn't necessarily mean the system actually understood what you wanted; it 
+might just mean one feature in the formula happened to win out over another, without 
+anyone — including the user — ever being told that trade-off happened.

@@ -156,6 +156,95 @@ Because: Acousticness match: +28.8, Energy match: +18.4, Valence match: +4.0
 
 ---
 
+## Stress Test Results
+
+Tested the recommender against four distinct user profiles, plus one adversarial profile, to check accuracy and surface edge cases.
+
+\`\`\`
+========================================
+Profile: Starter (Pop Happy)
+========================================
+Sunrise City – Score: 76.90
+Because: Acousticness match: +27.6, Energy match: +19.6, Valence match: +4.7, Genre match (pop): +15, Mood match (happy): +10
+
+Gym Hero – Score: 65.25
+Because: Acousticness match: +28.5, Energy match: +17.4, Valence match: +4.3, Genre match (pop): +15
+
+Rooftop Lights – Score: 56.25
+Because: Acousticness match: +22.5, Energy match: +19.2, Valence match: +4.5, Mood match (happy): +10
+
+Concrete Bars – Score: 51.80
+Because: Acousticness match: +29.4, Energy match: +18.8, Valence match: +3.6
+
+Pulse Machine – Score: 51.25
+Because: Acousticness match: +28.8, Energy match: +18.4, Valence match: +4.0
+
+========================================
+Profile: High-Energy Pop
+========================================
+Sunrise City – Score: 75.95
+Because: Acousticness match: +27.6, Energy match: +18.4, Valence match: +5.0, Genre match (pop): +15, Mood match (happy): +10
+
+Gym Hero – Score: 67.50
+Because: Acousticness match: +28.5, Energy match: +19.4, Valence match: +4.6, Genre match (pop): +15
+
+Rooftop Lights – Score: 54.50
+Because: Acousticness match: +22.5, Energy match: +17.2, Valence match: +4.8, Mood match (happy): +10
+
+Storm Runner – Score: 52.95
+Because: Acousticness match: +30.0, Energy match: +19.8, Valence match: +3.1
+
+Pulse Machine – Score: 52.70
+Because: Acousticness match: +28.8, Energy match: +19.6, Valence match: +4.3
+
+========================================
+Profile: Chill Lofi
+========================================
+Library Rain – Score: 76.20
+Because: Acousticness match: +29.7, Energy match: +17.0, Valence match: +4.5, Genre match (lofi): +15, Mood match (chill): +10
+
+Midnight Coding – Score: 71.10
+Because: Acousticness match: +25.8, Energy match: +15.6, Valence match: +4.7, Genre match (lofi): +15, Mood match (chill): +10
+
+Focus Flow – Score: 63.45
+Because: Acousticness match: +27.9, Energy match: +16.0, Valence match: +4.5, Genre match (lofi): +15
+
+Spacewalk Thoughts – Score: 60.55
+Because: Acousticness match: +27.9, Energy match: +18.4, Valence match: +4.2, Mood match (chill): +10
+
+Morning Adagio – Score: 51.75
+Because: Acousticness match: +27.3, Energy match: +19.6, Valence match: +4.8
+
+========================================
+Profile: Deep Intense Rock
+========================================
+Storm Runner – Score: 79.40
+Because: Acousticness match: +30.0, Energy match: +19.8, Valence match: +4.6, Genre match (rock): +15, Mood match (intense): +10
+
+Iron Verdict – Score: 61.70
+Because: Acousticness match: +28.2, Energy match: +18.8, Valence match: +4.7, Mood match (intense): +10
+
+Gym Hero – Score: 61.05
+Because: Acousticness match: +28.5, Energy match: +19.4, Valence match: +3.1, Mood match (intense): +10
+
+Pulse Machine – Score: 51.85
+Because: Acousticness match: +28.8, Energy match: +19.6, Valence match: +3.5
+
+Concrete Bars – Score: 50.10
+Because: Acousticness match: +29.4, Energy match: +16.8, Valence match: +3.9
+\`\`\`
+
+**Adversarial test — "The Acoustic Headbanger":** A profile requesting maximum energy 
+(1.0) AND maximum acousticness (1.0) at the same time — an internally contradictory 
+request, since acoustic music is rarely high-energy. This exposed a real weakness in 
+the scoring formula: because **acousticness (30 pts) outweighs energy (20 pts)**, this 
+profile's top recommendation was actually one of the calmest, most acoustic songs in 
+the catalog (e.g. "Old Pine Road," a folk song) — the opposite of what "energy: 1.0" 
+implies. The scorer has no way to detect or flag contradictory input; it just averages 
+the terms into a "compromise" that satisfies neither extreme.
+
+---
+
 ## Experiments You Tried
 
 Use this section to document the experiments you ran. For example:
