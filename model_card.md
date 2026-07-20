@@ -160,3 +160,11 @@ This changed how I think about real recommendation apps — a confident-looking 
 Pick" doesn't necessarily mean the system actually understood what you wanted; it 
 might just mean one feature in the formula happened to win out over another, without 
 anyone — including the user — ever being told that trade-off happened.
+
+Using Claude Code sped up implementation significantly — it correctly translated my 
+Phase 2 scoring recipe into working code on the first try, and independently verified 
+its own work by running test cases before reporting back. However, I had to double-
+check its "adversarial profile" suggestion by actually reading the score breakdown 
+myself to confirm the acousticness-over-energy bug was real and not just a fluke — AI 
+tools were fast at generating and testing code, but I still needed to verify the 
+*reasoning* behind the results made sense before trusting them.
